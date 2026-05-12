@@ -3,5 +3,7 @@ export const environment = {
 
     supabaseUrl: 'https://xjcdphpsoohbuftyozag.supabase.co',
 
-    supabaseKey: 'SUPABASE_KEY_REMOVED'
+    supabaseKey: 'SUPABASE_KEY_REMOVED',
+
+    supabaseEdgeFnUrl: 'SUPABASE_EDGE_FN_URL_REMOVED',
 };

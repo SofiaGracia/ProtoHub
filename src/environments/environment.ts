@@ -5,4 +5,5 @@ export const environment = {
 
     supabaseKey: 'SUPABASE_KEY_REMOVED',
 
+    supabaseEdgeFnUrl: 'SUPABASE_EDGE_FN_URL_REMOVED',
 };

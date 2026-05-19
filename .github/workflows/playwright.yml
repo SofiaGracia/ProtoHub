@@ -33,6 +33,12 @@ jobs:
     - name: Install Playwright Browsers
       run: npx playwright install chromium
 
+    - name: Inject secrets via set-env.js
+      run: node tools/set-env.js
+      env:
+        SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+        SUPABASE_EDGE_FN_URL: ${{ secrets.SUPABASE_EDGE_FN_URL }}
+
     - name: Run Playwright tests
       run: npx playwright test
       env:

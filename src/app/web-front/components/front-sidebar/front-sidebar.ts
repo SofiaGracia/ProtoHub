@@ -1,12 +1,14 @@
-import { Component } from '@angular/core';
+import { AsyncPipe } from '@angular/common';
+import { Component, Output, EventEmitter, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { AuthFacade } from '@auth/facades/auth.facade';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
-import { faBars, faTimes } from '@fortawesome/free-solid-svg-icons';
+import { faBars, faTimes, faRightFromBracket, faUserAlt, faMoon, faSun } from '@fortawesome/free-solid-svg-icons';
 import { SIDEMENUOPTIONS } from '@web-front/constants/sidebar-options.constant';
 
 @Component({
     selector: 'front-sidebar',
-    imports: [FaIconComponent, RouterLink],
+    imports: [FaIconComponent, RouterLink, AsyncPipe],
     templateUrl: './front-sidebar.html',
     styles: `
         .sidebar {
@@ -16,24 +18,65 @@ import { SIDEMENUOPTIONS } from '@web-front/constants/sidebar-options.constant';
             color: white;
             transition: width 0.3s;
             padding: 1rem;
-            overflow: hidden; /* importante: que no scrollee */
+            overflow: visible;
             flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
         }
 
         .sidebar.collapsed {
             width: 70px;
+            min-width: 70px;
+            z-index: 40;
+        }
+
+        .nav-links {
+            flex: 0;
+        }
+
+        .profile-btn {
+            border-top: 1px solid #374151;
+            padding-top: 1rem;
+            margin-top: auto;
+        }
+
+        .dropdown-content {
+            position: absolute;
+            z-index: 9999
+        }
+
+        .email-text {
+            text-overflow: ellipsis;
+            max-width: 15ch;
         }
     `,
 })
 export class FrontSidebar {
+    @Output() signOut = new EventEmitter<void>();
+
     sidebarOptions = SIDEMENUOPTIONS;
+    authFacade = inject(AuthFacade);
+
+    user$ = this.authFacade.currentUser$;
 
     faBars = faBars;
     faTimes = faTimes;
+    faRightFromBracket = faRightFromBracket;
+    faUser = faUserAlt;
+    faMoon = faMoon;
+    faSun = faSun;
 
     collapsed = false;
 
     toggle() {
         this.collapsed = !this.collapsed;
+    }
+
+    onSignOut(): void {
+        this.signOut.emit();
+    }
+
+    onChangeTheme(): void {
+        console.log('cambiar de tema')
     }
 }

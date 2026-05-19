@@ -1,16 +1,19 @@
-import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { Component, inject } from '@angular/core';
+import { Router, RouterOutlet } from '@angular/router';
+import { AsyncPipe } from '@angular/common';
 import { FrontSidebar } from '@web-front/components/front-sidebar/front-sidebar';
+import { AuthFacade } from '@auth/facades/auth.facade';
 
 @Component({
     selector: 'app-web-front-layout',
-    imports: [RouterOutlet, FrontSidebar],
+    imports: [RouterOutlet, AsyncPipe, FrontSidebar],
     templateUrl: './web-front-layout.html',
     styles: `
         .layout {
             display: flex;
             height: 100vh;
             overflow: hidden;
+            position: relative;
         }
 
         .content {
@@ -18,7 +21,19 @@ import { FrontSidebar } from '@web-front/components/front-sidebar/front-sidebar'
             padding: 2rem;
             height: 100%;
             overflow-y: auto;
+            scrollbar-gutter: stable;
+            position: relative
         }
     `,
 })
-export default class WebFrontLayout {}
+export default class WebFrontLayout {
+    private authFacade = inject(AuthFacade);
+    private router = inject(Router);
+
+    isAuthenticated$ = this.authFacade.isAuthenticated$;
+
+    async signOut(): Promise<void> {
+        await this.authFacade.signOut();
+        this.router.navigate(['/']);
+    }
+}

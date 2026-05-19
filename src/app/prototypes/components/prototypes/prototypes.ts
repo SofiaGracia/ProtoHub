@@ -7,10 +7,11 @@ import { PrototypeCard } from '../prototype-card/prototype-card';
 import { distinctUntilChanged, filter, map, tap } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { DialogPrototype } from '../dialog-prototype/dialog-prototype';
+import { Pagination } from '@shared/components/pagination/pagination';
 
 @Component({
     selector: 'app-prototypes',
-    imports: [AsyncPipe, PrototypeCard, DialogPrototype],
+    imports: [AsyncPipe, PrototypeCard, DialogPrototype, Pagination],
     templateUrl: './prototypes.html',
 })
 export class Prototypes {
@@ -21,7 +22,11 @@ export class Prototypes {
     projectsFacade = inject(ProjectsFacade);
 
     project$ = this.projectsFacade.project$;
-    prototypes$ = this.prototypesFacade.prototypes$;
+
+    paginatedData$ = this.prototypesFacade.paginatedPrototypes$;
+    totalPages$ = this.prototypesFacade.totalPages$;
+    currentPage$ = this.prototypesFacade.currentPage$;
+    totalCount$ = this.prototypesFacade.totalCount$;
 
     constructor() {
         this.route.paramMap
@@ -36,5 +41,9 @@ export class Prototypes {
                 takeUntilDestroyed(this.destroyRef),
             )
             .subscribe();
+    }
+
+    onPageChange(page: number) {
+        this.prototypesFacade.goToPage(page);
     }
 }

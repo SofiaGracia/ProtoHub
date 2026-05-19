@@ -1,34 +1,55 @@
-<div class="card bg-base-100 w-96 shadow-sm">
-    <figure>
-        <img
-            src="https://img.daisyui.com/images/stock/photo-1606107557195-0e29a4b5b4aa.webp"
-            alt="Shoes"
-        />
+<div class="card bg-base-100 shadow-sm cursor-pointer" (click)="openPreview()">
+    <figure class="h-48 overflow-hidden">
+        @if (htmlContent()) {
+            <iframe
+                [srcdoc]="htmlContent()!"
+                class="w-full h-full border-0 pointer-events-none"
+                style="transform: scale(0.5); transform-origin: top left; width: 200%; height: 200%"
+                sandbox="allow-scripts"
+                scrolling="no"
+            ></iframe>
+        } @else if (proto().url) {
+            <div class="w-full h-full bg-base-200 flex items-center justify-center">
+                <span class="loading loading-spinner"></span>
+            </div>
+        } @else {
+            <div
+                class="w-full h-full bg-base-200 flex items-center justify-center text-base-content/40"
+            >
+                No preview
+            </div>
+        }
     </figure>
     <div class="card-body">
-        <h2 class="card-title">
-            {{ proto().name }}
-            <div class="badge badge-secondary">NEW</div>
-        </h2>
-        <p>
-            {{ proto().description }}
-        </p>
-        <div class="dropdown dropdown-end" (click)="$event.stopPropagation()">
-            <label tabindex="0" class="btn btn-ghost btn-circle p-2 m-0">
-                <fa-icon [icon]="faEllipsis"></fa-icon>
-            </label>
-            <ul tabindex="0" class="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-32">
-                <li>
-                    <a (click)="deleteProto($event, proto().id, proto().project_id!)" class="text-red-600">
-                        Remove
-                    </a>
-                </li>
-                <!-- Modify -->
-            </ul>
-        </div>
-        <div class="card-actions justify-end">
-            <div class="badge badge-outline">{{ proto().tool }}</div>
-            <div class="badge badge-outline">{{ proto().tool }}</div>
+        <div class="flex flex-row justify-between items-center">
+            <div class="flex flex-col">
+                <h2 class="card-title">
+                    {{ proto().name }}
+                </h2>
+                <p>
+                    {{
+                        proto().description !== '' || null ? proto().description : 'No description'
+                    }}
+                </p>
+            </div>
+            <div class="dropdown dropdown-end" (click)="$event.stopPropagation()">
+                <label tabindex="0" class="btn btn-ghost btn-circle p-2 m-0">
+                    <fa-icon [icon]="faEllipsis"></fa-icon>
+                </label>
+                <ul
+                    tabindex="0"
+                    class="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-32"
+                >
+                    <li>
+                        <a
+                            (click)="deleteProto($event, proto().id, proto().project_id!)"
+                            class="text-red-600"
+                        >
+                            Move to Trash
+                        </a>
+                    </li>
+                </ul>
+            </div>
         </div>
     </div>
 </div>

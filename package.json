@@ -11,7 +11,7 @@
     "watch": "ng build --watch --configuration development",
     "pretest": "node tools/set-env.js",
     "test": "ng test",
-    "test:ci": "ng test --watch=false --no-watch --browsers=ChromeHeadless",
+    "test:ci": "ng test --watch=false",
     "test:coverage": "ng test --watch=false --coverage"
   },
   "prettier": {

@@ -6,6 +6,7 @@
     [submitFn]="onSubmit.bind(this)"
     [errorsFn]="errorsName.bind(this)"
     [onClose]="closeModal.bind(this)"
+    data-testid="prototype-dialog"
 >
     <h3 slot="title" class="text-lg font-bold">Create prototype</h3>
     <h4 slot="debug">{{ prototype() | json }}</h4>
@@ -17,6 +18,7 @@
             <label
                 for="dropzone-file"
                 class="flex flex-col items-center justify-center w-full h-64 bg-neutral-secondary-medium border border-dashed border-default-strong rounded-base cursor-pointer hover:bg-neutral-tertiary-medium"
+                data-testid="prototype-dropzone"
             >
                 <div class="flex flex-col items-center justify-center text-body pt-5 pb-6">
                     <svg
@@ -50,6 +52,7 @@
                     class="hidden"
                     accept=".html,text/html"
                     (change)="onFileSelected($event)"
+                    data-testid="prototype-html-file-input"
                 />
             </label>
         </div>

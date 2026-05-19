@@ -1,14 +1,18 @@
-import { inject, Injectable } from '@angular/core';
+import { DestroyRef, inject, Injectable } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Project, ProjectInterface } from '@projects/interfaces/project.interface';
 import { ProjectSupabaseService } from '@projects/services/projectsSupabase.service';
 import { PaginatedResponse } from '@shared/interfaces/paginated-response.interface';
 import { AuthFacade } from '@auth/facades/auth.facade';
-import { BehaviorSubject, switchMap, of, Observable, combineLatest, map, tap } from 'rxjs';
+import { BehaviorSubject, switchMap, of, Observable, combineLatest, map, tap, forkJoin } from 'rxjs';
+import { PrototypesSupabaseService } from '@prototypes/services/prototypesSupabase.service';
 
 @Injectable({ providedIn: 'root' })
 export class ProjectsFacade {
     private projectSupabaseService = inject(ProjectSupabaseService);
+    private prototypesSupabaseService = inject(PrototypesSupabaseService);
     private authFacade = inject(AuthFacade);
+    private destroyRef = inject(DestroyRef);
     private limit = 8;
 
     private refresh$ = new BehaviorSubject<void>(undefined);
@@ -22,11 +26,13 @@ export class ProjectsFacade {
     }
 
     constructor() {
-        this.authFacade.currentUser$.subscribe((user) => {
-            if (!user) {
-                this.clearCache();
-            }
-        });
+        this.authFacade.currentUser$
+            .pipe(takeUntilDestroyed(this.destroyRef))
+            .subscribe((user) => {
+                if (!user) {
+                    this.clearCache();
+                }
+            });
     }
 
     projects$ = combineLatest([this.refresh$, this.authFacade.currentUser$]).pipe(
@@ -129,7 +135,10 @@ export class ProjectsFacade {
         const currentPage = this.page$.value;
         const currentTotal = this.lastResponse?.total ?? 0;
 
-        this.projectSupabaseService.moveToTrash(projectId).subscribe({
+        forkJoin([
+            this.projectSupabaseService.moveToTrash(projectId),
+            this.prototypesSupabaseService.bulkMoveToTrashByProject(projectId),
+        ]).subscribe({
             next: () => {
                 this.clearCache();
 
@@ -158,6 +167,32 @@ export class ProjectsFacade {
                 console.error('Error updating project', err);
             },
         });
+    }
+
+    restoreProjectFromTrash(projectId: number): Observable<void> {
+        return forkJoin([
+            this.projectSupabaseService.restoreProject(projectId),
+            this.prototypesSupabaseService.bulkRestoreByProject(projectId),
+        ]).pipe(
+            tap(() => {
+                this.clearCache();
+                this.refresh$.next();
+            }),
+            map(() => undefined),
+        );
+    }
+
+    permanentDeleteProjectFromTrash(projectId: number): Observable<void> {
+        return forkJoin([
+            this.projectSupabaseService.permanentDeleteProject(projectId),
+            this.prototypesSupabaseService.bulkPermanentDeleteByProject(projectId),
+        ]).pipe(
+            tap(() => {
+                this.clearCache();
+                this.refresh$.next();
+            }),
+            map(() => undefined),
+        );
     }
 
     searchProjectsByName(query: string): Observable<ProjectInterface[] | null> {

@@ -63,3 +63,11 @@ node_modules/
 # Supabase
 supabase/.temp
 
+# Internal work files
+DATA_TESTID.md
+Nous_passos.txt
+PROMPT
+RESPONSE.md
+TECHNICAL_AUDIT.md
+fixes.md
+
